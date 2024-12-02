@@ -6,6 +6,8 @@ from tqdm import tqdm
 from global_var import nba_shots
 from shot import NBAShot
 import csv
+from flask import request, jsonify
+from tf_idf_search import TFIDFSearch
 
 def load_shots_from_csv(file_path):
     csv_file = file_path  # Use the provided file path
@@ -53,6 +55,18 @@ load_shots_from_csv(file_path)
 @app.route("/test")
 def hello():
     return "Hello, World!"
+
+tfidf = TFIDFSearch()
+tfidf.preprocessData()
+tfidf.compute_TF_IDF()
+
+@app.route("/search", methods=["GET"])
+def search_shots():
+    query = request.args.get("query", "")
+    if not query:
+        return jsonify({"Error: Query parameter missing"}), 400
+    results = tfidf.search(query)
+    return jsonify([str(shot) for shot in results])
 
 if __name__ == "__main__":
     app.run(debug=True)
