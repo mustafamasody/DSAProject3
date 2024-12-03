@@ -10,17 +10,18 @@ class TFIDFSearch:
         self.TF_IDF_matrix = []
 
     def preprocessData(self):
-        """Prepare text data for TF-IDF computation."""
+        # Prepare text data for TF-IDF computation.
         self.shot_texts = []
         for shot in nba_shots:
             shot_text = (
-                f"{shot.player_name} {shot.event_type} {shot.shot_type} "
-                f"{shot.basic_zone} {shot.zone_name} {shot.action_type}"
+                f"{shot.player_name.strip().lower()} {shot.event_type.lower()} {shot.shot_type.lower()} "
+                f"{shot.basic_zone.lower()} {shot.zone_name.lower()} {shot.action_type.lower()}"
             )
             self.shot_texts.append(shot_text)
 
+
     def compute_TF_IDF(self):
-        """Calculate TF-IDF scores for all shots."""
+        # Calculate TF-IDF scores for all shots.
         # Step 1: Calculate Term Frequencies (TF)
         for text in self.shot_texts:
             term_count = defaultdict(int)
@@ -46,11 +47,13 @@ class TFIDFSearch:
             self.TF_IDF_matrix.append(TF_IDF)
 
     def search(self, parameter, query, top_k=5):
-        """Search for relevant NBA shots based on a parameter and query."""
         query_words = query.lower().split()
         query_scores = []
 
         for idx, TF_IDF in enumerate(self.TF_IDF_matrix):
+            # Print debug info to see what is being compared
+            print(f"Checking shot {idx} with text: {self.shot_texts[idx]}")
+
             # Check if the parameter matches the text to include the shot in search
             if parameter.lower() in self.shot_texts[idx].lower():
                 score = sum(TF_IDF.get(word, 0) for word in query_words)
