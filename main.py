@@ -1,12 +1,13 @@
 # main.py
 # Main file for the project
 
+import time
 from tqdm import tqdm
 from global_var import nba_shots
 from shot import NBAShot
 import csv
-from flask import request, jsonify
 from tf_idf_search import TFIDFSearch
+from inverted_index_search import InvertedIndexSearch
 
 def load_shots_from_csv(file_path):
     csv_file = file_path  # Use the provided file path
@@ -21,19 +22,19 @@ def load_shots_from_csv(file_path):
                 team_id=int(row["TEAM_ID"]),
                 team_name=row["TEAM_NAME"],
                 player_id=int(row["PLAYER_ID"]),
-                player_name=row["PLAYER_NAME"],
+                player_name=row["PLAYER_NAME"].strip().lower(), # KEEP
                 position_group=row["POSITION_GROUP"],
                 position=row["POSITION"],
                 game_date=row["GAME_DATE"],
                 game_id=int(row["GAME_ID"]),
                 home_team=row["HOME_TEAM"],
                 away_team=row["AWAY_TEAM"],
-                event_type=row["EVENT_TYPE"],
+                event_type=row["EVENT_TYPE"], # KEEP
                 shot_made=row["SHOT_MADE"] == "TRUE",
-                action_type=row["ACTION_TYPE"],
-                shot_type=row["SHOT_TYPE"],
-                basic_zone=row["BASIC_ZONE"],
-                zone_name=row["ZONE_NAME"],
+                action_type=row["ACTION_TYPE"], # KEEP
+                shot_type=row["SHOT_TYPE"], # KEEP
+                basic_zone=row["BASIC_ZONE"], # KEEP
+                zone_name=row["ZONE_NAME"], # KEEP
                 zone_abb=row["ZONE_ABB"],
                 zone_range=row["ZONE_RANGE"],
                 loc_x=float(row["LOC_X"]),
@@ -45,14 +46,6 @@ def load_shots_from_csv(file_path):
             )
             nba_shots.append(shot)
 
-# @app.route("/search", methods=["GET"])
-# def search_shots():
-#     query = request.args.get("query", "")
-#     if not query:
-#         return jsonify({"Error: Query parameter missing"}), 400
-#     results = tfidf.search(query)
-#     return jsonify([str(shot) for shot in results])
-
 def main():
 
     file_path = "NBA_2024_Shots.csv"  # Replace with the path to your CSV
@@ -62,52 +55,96 @@ def main():
     tfidf = TFIDFSearch()
     tfidf.preprocessData()
     tfidf.compute_TF_IDF()
+
+    inverted_index = InvertedIndexSearch()
+    inverted_index.preprocessData()
+
     
-    print("Welcome message")
+    print("Welcome to the NBA Shot Search Engine!")
     while True: 
         print("\nPlease choose an option:")
-        print("1. Search for NBA shots (with filters)")
-        print("2. Search with AI")
+        print("1. Search for NBA shots with TF-IDF Searching Algorithm")
+        print("2. Search for NBA shots with Inverted Index Searching Algorithm")
         print("3. Exit")
 
         choice = input("Enter your choice (1/2/3): ").strip()
 
         if choice == '1':
-            print("This program supports querying by the following parameters:")
-            print("1. Player name")
-            print("2. Event type")
-            print("3. Shot type")
-            print("4. Basic zone")
-            print("5. Zone name")
-            print("6. Action type")
-
+            print_choices()
             parameter_choice = input("Enter the number of the parameter you want to query by: ").strip()
-            
-            query_map = {
-                '1': 'player_name',
-                '2': 'event_type',
-                '3': 'shot_type',
-                '4': 'basic_zone',
-                '5': 'zone_name',
-                '6': 'action_type'
-            }
+            result_count = input("How many results would you like? (Enter 1-218702): ")
+
+            if not result_count.isdigit():
+                print("Invalid input. Please enter a number.")
+                continue
+
+            result_count = int(result_count)
+            if not 1 <= result_count <= 218702:
+                print("Invalid input. Please enter a number between 1 and 218,702.")
+                continue
             
             if parameter_choice in query_map:
                 parameter = query_map[parameter_choice]
                 query = input(f"Enter your query for {parameter}: ").strip()
-                results = tfidf.search(parameter, query)  # Pass both parameter and query
-                print(f"Found {len(results)} results:")
+
+                time_before = time.time()
+                results = tfidf.search(parameter, query, result_count)  # Pass parameter, query, and result count
+                time_after = time.time()
+
+                print(f"Found {len(results)} results in {time_after - time_before:.4f} seconds:")
                 for shot in results:
                     print(shot)
             else:
                 print("Invalid parameter choice.")
         elif choice == '2':
-            print("2")
+            print_choices()
+
+            parameter_choice = input("Enter the number of the parameter you want to query by: ").strip()
+            result_count = input("How many results would you like? (Enter 1-218702): ")
+
+            if not result_count.isdigit():
+                print("Invalid input. Please enter a number.")
+                continue
+
+            result_count = int(result_count)
+            if not 1 <= result_count <= 218702:
+                print("Invalid input. Please enter a number between 1 and 218,702.")
+                continue
+            
+            if parameter_choice in query_map:
+                parameter = query_map[parameter_choice]
+                query = input(f"Enter your query for {parameter}: ").strip()
+
+                time_before = time.time()
+                results = inverted_index.search(parameter, query, result_count)
+                time_after = time.time()
+
+                print(f"Found {len(results)} results in {time_after - time_before:.4f} seconds:")
+                for shot in results:
+                    print(shot)
         elif choice == '3':
             print("Exiting the program...")
             break
         else:
             print("Invalid choice. Please try again.")
+
+query_map = {
+    '1': 'player_name',
+    '2': 'event_type',
+    '3': 'shot_type',
+    '4': 'basic_zone',
+    '5': 'zone_name',
+    '6': 'action_type'
+}
+
+def print_choices():
+    print("This program supports querying by the following parameters:")
+    print("1. Player name")
+    print("2. Event type")
+    print("3. Shot type")
+    print("4. Basic zone")
+    print("5. Zone name")
+    print("6. Action type")
 
 if __name__ == "__main__":
     main()

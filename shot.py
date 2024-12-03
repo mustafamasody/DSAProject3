@@ -57,9 +57,3 @@ entry = NBAShot(
     zone_abb="RC", zone_range="24+ ft.", loc_x=-11, loc_y=31.65, shot_distance=28,
     quarter=4, mins_left=0, secs_left=30
 )
-
-# Using the object
-print(entry)  # Dejounte Murray (SG) - Missed Shot (3PT Field Goal) at 28 ft.
-print(f"Time remaining in quarter: {entry.time_remaining_in_quarter()} seconds")
-print(f"Is a three-pointer: {entry.is_three_pointer()}")
-print(f"Was the shot successful: {entry.is_successful()}")

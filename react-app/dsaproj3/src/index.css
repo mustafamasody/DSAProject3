@@ -1,0 +1,345 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Chrome, Edge, and Safari */
+/* *::-webkit-scrollbar {
+  display: none;
+} */
+
+.tiptap-content a {
+  color: blue;
+  text-decoration: underline;
+}
+
+.tiptap-content a:hover {
+  color: darkblue;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+
+.custom-link-style {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.dragging .bg-blue-100 {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+[data-theme="dark"] .custom-link-style {
+  color: rgb(46, 108, 170);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Customize bullet list */
+.editor-content ul {
+  list-style-type: disc;
+  margin-left: 20px;
+}
+
+/* Customize numbered list */
+.editor-content ol {
+  list-style-type: decimal;
+  margin-left: 20px;
+}
+
+/* Customize checklist */
+.editor-content .checklist {
+  margin-left: 20px;
+}
+
+/* Customize blockquote */
+.editor-content blockquote {
+  border-left: 4px solid #ccc;
+  padding-left: 10px;
+  color: #666;
+  margin-left: 20px;
+}
+
+
+/* Basic table styling */
+.editor-content table {
+  width: 10%;
+  border-collapse: collapse;
+  margin-bottom: 1em;
+}
+
+/* Table header styling */
+.editor-content th {
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+/* Cursor resize at border */
+.editor-content th {
+  resize: horizontal;
+  overflow: auto;
+}
+
+/* Table cell styling */
+.editor-content td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+/* Cursor resize at border */
+.editor-content td {
+  resize: horizontal;
+  overflow: auto;
+}
+
+/* Optional: Adding alternating row colors */
+.editor-content tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Optional: Dark mode adjustments */
+[data-theme="dark"] .editor-content th {
+  background-color: #333;
+  color: #fff;
+  border-color: #555;
+}
+
+[data-theme="dark"] .editor-content td {
+  border-color: #555;
+}
+
+[data-theme="dark"] .editor-content tr {
+  background-color: #444;
+}
+
+/* [data-theme="dark"] .editor-content tr:nth-child(even) {
+  background-color: #444;
+} */
+
+
+/* General text styling for the editor */
+.editor-content {
+  font-family: 'PoppinsCSS', sans-serif;
+  line-height: 1.6;
+}
+
+/* Paragraph styling */
+.editor-content p {
+  /* font-size: 14px; */
+  font-size: inherit;
+  font-weight: 400; /* Regular weight */
+  margin-bottom: 1em;
+}
+
+/* Add support for inline font-size styles */
+
+
+/* Bold styling */
+.editor-content strong {
+  font-weight: 700; /* Bold weight */
+}
+
+/* Heading 1 styling */
+.editor-content h1 {
+  font-size: 32px; /* Set the font size for Heading 1 */
+  font-weight: 700; /* Use the Black variant */
+  margin-bottom: 0.5em;
+}
+
+/* Heading 2 styling */
+.editor-content h2 {
+  font-size: 25px; /* Set the font size for Heading 2 */
+  font-weight: 500; /* Use the Medium variant */
+  margin-bottom: 0.5em;
+}
+
+/* Heading 3 styling */
+.editor-content h3 {
+  font-size: 20px; /* Set the font size for Heading 3 */
+  font-weight: 600; /* Use the SemiBold variant */
+  margin-bottom: 0.5em;
+}
+
+.editor-content pre {
+  background-color: #e1e1e1;
+  border-radius: 5px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.editor-content code {
+  font-family: 'Source Code Pro', monospace; /* Use a monospace font for code */
+  font-size: 14px;
+  background-color: rgba(27, 31, 35, 0.05);
+  border-radius: 3px;
+  padding: 0.2em 0.4em;
+}
+
+[data-theme="dark"] .editor-content code {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .editor-content pre {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Basic editor styles */
+.tiptap pre, 
+.tiptap code {
+  background-color: #000000; /* Background color of the code editor */
+}
+
+.tiptap {
+  /* Ensure that the first child has no top margin */
+  margin-top: 0;
+}
+
+.tiptap code {
+  background: #000000; /* Background color for inline code */
+  color: inherit;
+  font-size: 0.8rem;
+  padding: 0;
+}
+
+.tiptap pre {
+  background: #000000; /* Background color for code blocks */
+  border-radius: 0.5rem;
+  color: #ffffff; /* Text color */
+  font-family: 'JetBrainsMono', monospace;
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem;
+}
+
+.tiptap pre .code {
+  background: #000000; /* Background color inside code blocks */
+  color: inherit;
+  font-size: 0.8rem;
+  padding: 0;
+}
+
+/* Code styling */
+.tiptap pre .hljs-comment,
+.tiptap pre .hljs-quote {
+  color: #616161;
+}
+
+.tiptap pre .hljs-variable,
+.tiptap pre .hljs-template-variable,
+.tiptap pre .hljs-attribute,
+.tiptap pre .hljs-tag,
+.tiptap pre .hljs-name,
+.tiptap pre .hljs-regexp,
+.tiptap pre .hljs-link,
+.tiptap pre .hljs-name,
+.tiptap pre .hljs-selector-id,
+.tiptap pre .hljs-selector-class {
+  color: #f98181;
+}
+
+.tiptap pre .hljs-number,
+.tiptap pre .hljs-meta,
+.tiptap pre .hljs-built_in,
+.tiptap pre .hljs-builtin-name,
+.tiptap pre .hljs-literal,
+.tiptap pre .hljs-type,
+.tiptap pre .hljs-params {
+  color: #fbbc88;
+}
+
+.tiptap pre .hljs-string,
+.tiptap pre .hljs-symbol,
+.tiptap pre .hljs-bullet {
+  color: #b9f18d;
+}
+
+.tiptap pre .hljs-title,
+.tiptap pre .hljs-section {
+  color: #faf594;
+}
+
+.tiptap pre .hljs-keyword,
+.tiptap pre .hljs-selector-tag {
+  color: #70cff8;
+}
+
+.tiptap pre .hljs-emphasis {
+  font-style: italic;
+}
+
+.tiptap pre .hljs-strong {
+  font-weight: 700;
+}
+
+
+
+@layer utilities {
+      .no-scrollbar::-webkit-scrollbar {
+          display: none;
+      }
+      .no-scrollbar {
+          -ms-overflow-style: none; 
+          scrollbar-width: none;  
+    }
+  }
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;  /* Adjust this value for horizontal scrollbar height */
+
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none; 
+  scrollbar-width: none;  
+}
+
+@layer components {
+  
+    .image-container::before {
+      content: "";
+      position: absolute;
+      top: -10px; right: -10px; bottom: -10px; left: -10px;
+      background: linear-gradient(45deg, #6ee7b7, #3b82f6, #9333ea);
+      filter: blur(8px);
+      z-index: -1;
+    }
+  }

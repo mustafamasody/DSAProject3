@@ -31,7 +31,23 @@ class InvertedIndexSearch:
     def compute_TF_IDF(self):
         pass
 
-    def search(self, parameter, query):
+    # def search(self, parameter, query):
+    #     tokens = self._tokenize_and_normalize(query)
+    #     if not tokens:
+    #         return []
+
+    #     # Retrieve shot indices for the first token
+    #     result_indices = self.inverted_index.get((parameter, tokens[0]), set()).copy()
+    #     # Intersect with shot indices for subsequent tokens
+    #     for token in tokens[1:]:
+    #         indices = self.inverted_index.get((parameter, token), set())
+    #         result_indices &= indices
+
+    #     # Retrieve the shots corresponding to the result indices
+    #     results = [self.shots[idx] for idx in result_indices]
+    #     return results
+
+    def search(self, parameter, query, top_k):
         tokens = self._tokenize_and_normalize(query)
         if not tokens:
             return []
@@ -45,4 +61,6 @@ class InvertedIndexSearch:
 
         # Retrieve the shots corresponding to the result indices
         results = [self.shots[idx] for idx in result_indices]
-        return results
+        return results[:top_k]  # Return only the top_k results
+
+        

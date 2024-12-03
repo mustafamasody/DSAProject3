@@ -46,25 +46,18 @@ class TFIDFSearch:
                 TF_IDF[term] = freq * self.inverse_document_frequency[term]
             self.TF_IDF_matrix.append(TF_IDF)
 
-    def search(self, parameter, query, top_k=5):
-        query_words = query.lower().split()
-        query_scores = []
+    def search(self, parameter, query, top_k):
+        query = query.lower().strip()  # Normalize query
+        results = []
 
-        for idx, TF_IDF in enumerate(self.TF_IDF_matrix):
-            # Print debug info to see what is being compared
-            print(f"Checking shot {idx} with text: {self.shot_texts[idx]}")
+        for _, shot in enumerate(nba_shots):
+            # Access the attribute dynamically based on the parameter
+            shot_value = getattr(shot, parameter, "").lower()
 
-            # Check if the parameter matches the text to include the shot in search
-            if parameter.lower() in self.shot_texts[idx].lower():
-                score = sum(TF_IDF.get(word, 0) for word in query_words)
-                query_scores.append((score, idx))
+            # Match the query to the attribute value
+            if query in shot_value:
+                results.append(shot)
 
-        if not query_scores:
-            print("No matching results found.")
-            return []
+        # Return top_k results or all matches
+        return results[:top_k]
 
-        # Sort by score and return the top_k results
-        query_scores.sort(reverse=True, key=lambda x: x[0])
-        print("Sorted Query Scores:", query_scores)  # Debugging output
-        results = [nba_shots[idx] for _, idx in query_scores[:top_k] if _ > 0]
-        return results
