@@ -34,6 +34,22 @@ class InvertedIndexSearch:
         # Placeholder method for compatibility; not used in inverted index search
         pass
 
+     # def search(self, parameter, query):
+    #     tokens = self._tokenize_and_normalize(query)
+    #     if not tokens:
+    #         return []
+
+    #     # Retrieve shot indices for the first token
+    #     result_indices = self.inverted_index.get((parameter, tokens[0]), set()).copy()
+    #     # Intersect with shot indices for subsequent tokens
+    #     for token in tokens[1:]:
+    #         indices = self.inverted_index.get((parameter, token), set())
+    #         result_indices &= indices
+
+    #     # Retrieve the shots corresponding to the result indices
+    #     results = [self.shots[idx] for idx in result_indices]
+    #     return results
+
     def search(self, parameter, query, top_k):
         # Tokenize and normalize the query string
         tokens = self._tokenize_and_normalize(query)
