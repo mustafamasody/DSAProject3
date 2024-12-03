@@ -2,6 +2,13 @@ import math
 from collections import defaultdict
 from global_var import nba_shots
 
+# saeed what does this query by
+# player name?
+# all 6 parameters in the shot_text variable: player name, event type, shot type, basic zone, zone name, action type
+# if im not retarted
+
+# perfect 
+
 class TFIDFSearch:
     def __init__(self):
         self.shot_texts = []
