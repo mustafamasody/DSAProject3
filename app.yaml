@@ -1,2 +1,3 @@
 runtime: python312
 entrypoint: python3 main.py
+instance_class: F4  # Use a larger instance class

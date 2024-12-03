@@ -20,31 +20,28 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
 def load_shots_from_csv(file_path):
-    csv_file = file_path  # Use the provided file path
-    total_lines = sum(1 for _ in open(csv_file, encoding='utf-8')) - 1  # Total rows (excluding header)
-
-    with open(csv_file, newline='', encoding='utf-8') as file:
+    with open(file_path, newline='', encoding='utf-8') as file:
         reader = csv.DictReader(file)
-        for row in tqdm(reader, total=total_lines, desc="Loading NBA Shots", unit="shots"):
-            shot = NBAShot(
+        for row in reader:
+            yield NBAShot(
                 season_1=int(row["SEASON_1"]),
                 season_2=row["SEASON_2"],
                 team_id=int(row["TEAM_ID"]),
                 team_name=row["TEAM_NAME"],
                 player_id=int(row["PLAYER_ID"]),
-                player_name=row["PLAYER_NAME"].strip().lower(), # KEEP
+                player_name=row["PLAYER_NAME"].strip().lower(),
                 position_group=row["POSITION_GROUP"],
                 position=row["POSITION"],
                 game_date=row["GAME_DATE"],
                 game_id=int(row["GAME_ID"]),
                 home_team=row["HOME_TEAM"],
                 away_team=row["AWAY_TEAM"],
-                event_type=row["EVENT_TYPE"], # KEEP
+                event_type=row["EVENT_TYPE"],
                 shot_made=row["SHOT_MADE"] == "TRUE",
-                action_type=row["ACTION_TYPE"], # KEEP
-                shot_type=row["SHOT_TYPE"], # KEEP
-                basic_zone=row["BASIC_ZONE"], # KEEP
-                zone_name=row["ZONE_NAME"], # KEEP
+                action_type=row["ACTION_TYPE"],
+                shot_type=row["SHOT_TYPE"],
+                basic_zone=row["BASIC_ZONE"],
+                zone_name=row["ZONE_NAME"],
                 zone_abb=row["ZONE_ABB"],
                 zone_range=row["ZONE_RANGE"],
                 loc_x=float(row["LOC_X"]),
@@ -54,13 +51,11 @@ def load_shots_from_csv(file_path):
                 mins_left=int(row["MINS_LEFT"]),
                 secs_left=int(row["SECS_LEFT"])
             )
-            nba_shots.append(shot)
+
+for shot in load_shots_from_csv("shots.csv"):
+    nba_shots.append(shot)
 
 def main():
-
-    file_path = "shots.csv"  # Replace with the path to your CSV
-    print("Loading NBA shots...")
-    load_shots_from_csv(file_path)
 
     tfidf = TFIDFSearch()
     tfidf.preprocessData()
@@ -221,7 +216,7 @@ def handle_post():
     return jsonify({"received": data})
 
 def start_server():
-    load_shots_from_csv("shots.csv")  # Preload shots for web mode
+    # load_shots_from_csv("shots.csv")  # Preload shots for web mode
     tfidf = TFIDFSearch()
     tfidf.preprocessData()
     tfidf.compute_TF_IDF()
@@ -235,6 +230,8 @@ def start_server():
 
 if __name__ == '__main__':
     mode = os.getenv("APP_MODE")
+
+    print("Loading data...")
 
     if mode == '1':
         main()
