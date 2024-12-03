@@ -8,6 +8,16 @@ from shot import NBAShot
 import csv
 from tf_idf_search import TFIDFSearch
 from inverted_index_search import InvertedIndexSearch
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+app = Flask(__name__)
+
+CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
 def load_shots_from_csv(file_path):
     csv_file = file_path  # Use the provided file path
@@ -48,7 +58,7 @@ def load_shots_from_csv(file_path):
 
 def main():
 
-    file_path = "NBA_2024_Shots.csv"  # Replace with the path to your CSV
+    file_path = "shots.csv"  # Replace with the path to your CSV
     print("Loading NBA shots...")
     load_shots_from_csv(file_path)
 
@@ -146,5 +156,90 @@ def print_choices():
     print("5. Zone name")
     print("6. Action type")
 
-if __name__ == "__main__":
-    main()
+@app.route('/api/query', methods=['POST'])
+def handle_post():
+    # Access JSON data from the request body
+    data = request.get_json()  # Parses JSON body
+    if data is None:
+        return jsonify({"error": "Invalid or missing JSON"}), 400
+    
+    if 'request_type' not in data:
+        return jsonify({"error": "Missing 'request_type' in JSON"}), 400
+    
+    request_type = data['request_type']
+
+    if 'param' not in data:
+        return jsonify({"error": "Missing 'param' in JSON"}), 400
+    
+    param = data['param']
+
+    if param not in query_map.values():
+        return jsonify({"error": "Invalid parameter"}), 400
+    
+    if 'value' not in data:
+        return jsonify({"error": "Missing 'value' in JSON"}), 400
+    
+    value = data['value']
+
+    if 'result_limit' not in data:
+        return jsonify({"error": "Missing 'result_limit' in JSON"}), 400
+    
+    result_limit = data['result_limit']
+
+    # parse result_limit as an integer
+    result_limit = int(result_limit)
+
+    if not isinstance(result_limit, int) or not 1 <= result_limit <= 218702:
+        return jsonify({"error": "Invalid 'result_limit' value"}), 400
+    
+    if request_type == 'tfidf':
+        tfidf = TFIDFSearch()
+        tfidf.preprocessData()
+        tfidf.compute_TF_IDF()
+
+        time_before = time.time()
+        results = tfidf.search(param, value, result_limit)
+        time_after = time.time()
+
+        time_took = f"{time_after - time_before:.4f}"
+        result_count = len(results) 
+
+        return jsonify({"results": [shot.__dict__ for shot in results], "time": time_took, "count": result_count})
+    elif request_type == 'iis':
+        inverted_index = InvertedIndexSearch()
+        inverted_index.preprocessData()
+
+        time_before = time.time()
+        results = inverted_index.search(param, value, result_limit)
+        time_after = time.time()
+
+        time_took = f"{time_after - time_before:.4f}"
+        result_count = len(results)
+
+        return jsonify({"results": [shot.__dict__ for shot in results], "time": time_took, "count": result_count})
+    
+    return jsonify({"received": data})
+
+def start_server():
+    load_shots_from_csv("shots.csv")  # Preload shots for web mode
+    tfidf = TFIDFSearch()
+    tfidf.preprocessData()
+    tfidf.compute_TF_IDF()
+
+    inverted_index = InvertedIndexSearch()
+    inverted_index.preprocessData()
+    tfidf.preprocessData()
+    tfidf.compute_TF_IDF()
+    inverted_index.preprocessData()
+    app.run(debug=False)
+
+if __name__ == '__main__':
+    mode = os.getenv("APP_MODE")
+
+    if mode == '1':
+        main()
+    elif mode == '2':
+        start_server()
+    else:
+        print("Invalid mode. Starting in server mode.")
+        start_server()
