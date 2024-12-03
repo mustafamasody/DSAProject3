@@ -8,8 +8,6 @@ import csv
 from flask import request, jsonify
 from tf_idf_search import TFIDFSearch
 
-# ok were now merged
-
 def load_shots_from_csv(file_path):
     csv_file = file_path  # Use the provided file path
     total_lines = sum(1 for _ in open(csv_file, encoding='utf-8')) - 1  # Total rows (excluding header)
