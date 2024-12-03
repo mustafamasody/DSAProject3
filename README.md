@@ -1,5 +1,5 @@
-INSTRUCTIONS FOR RUNNING CODE: \n
-1.) Clone the repository \n
+INSTRUCTIONS FOR RUNNING CODE: 
+1.) Clone the repository 
 2.) Navigate to main.py
 3.) In the terminal, run these commands:
     pip install flask
