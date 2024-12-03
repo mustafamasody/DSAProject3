@@ -13,16 +13,19 @@ from flask_cors import CORS
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # Load environment variables from a .env file
 
 app = Flask(__name__)
 
+# Enable Cross-Origin Resource Sharing for all routes under /api/*
 CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
 def load_shots_from_csv(file_path):
+    """Generator function to load NBA shots from a CSV file."""
     with open(file_path, newline='', encoding='utf-8') as file:
         reader = csv.DictReader(file)
         for row in reader:
+            # Yield a NBAShot instance for each row in the CSV
             yield NBAShot(
                 season_1=int(row["SEASON_1"]),
                 season_2=row["SEASON_2"],
@@ -52,11 +55,12 @@ def load_shots_from_csv(file_path):
                 secs_left=int(row["SECS_LEFT"])
             )
 
+# Load shots from CSV and append to the global nba_shots list
 for shot in load_shots_from_csv("shots.csv"):
     nba_shots.append(shot)
 
 def main():
-
+    # Initialize search algorithms
     tfidf = TFIDFSearch()
     tfidf.preprocessData()
     tfidf.compute_TF_IDF()
@@ -64,9 +68,9 @@ def main():
     inverted_index = InvertedIndexSearch()
     inverted_index.preprocessData()
 
-    
     print("Welcome to the NBA Shot Search Engine!")
-    while True: 
+    while True:
+        # Display the main menu
         print("\nPlease choose an option:")
         print("1. Search for NBA shots with TF-IDF Searching Algorithm")
         print("2. Search for NBA shots with Inverted Index Searching Algorithm")
@@ -75,6 +79,7 @@ def main():
         choice = input("Enter your choice (1/2/3): ").strip()
 
         if choice == '1':
+            # TF-IDF search selected
             print_choices()
             parameter_choice = input("Enter the number of the parameter you want to query by: ").strip()
             result_count = input("How many results would you like? (Enter 1-218702): ")
@@ -87,11 +92,12 @@ def main():
             if not 1 <= result_count <= 218702:
                 print("Invalid input. Please enter a number between 1 and 218,702.")
                 continue
-            
+
             if parameter_choice in query_map:
                 parameter = query_map[parameter_choice]
                 query = input(f"Enter your query for {parameter}: ").strip()
 
+                # Measure search time
                 time_before = time.time()
                 results = tfidf.search(parameter, query, result_count)  # Pass parameter, query, and result count
                 time_after = time.time()
@@ -102,8 +108,8 @@ def main():
             else:
                 print("Invalid parameter choice.")
         elif choice == '2':
+            # Inverted Index search selected
             print_choices()
-
             parameter_choice = input("Enter the number of the parameter you want to query by: ").strip()
             result_count = input("How many results would you like? (Enter 1-218702): ")
 
@@ -115,11 +121,12 @@ def main():
             if not 1 <= result_count <= 218702:
                 print("Invalid input. Please enter a number between 1 and 218,702.")
                 continue
-            
+
             if parameter_choice in query_map:
                 parameter = query_map[parameter_choice]
                 query = input(f"Enter your query for {parameter}: ").strip()
 
+                # Measure search time
                 time_before = time.time()
                 results = inverted_index.search(parameter, query, result_count)
                 time_after = time.time()
@@ -127,12 +134,16 @@ def main():
                 print(f"Found {len(results)} results in {time_after - time_before:.4f} seconds:")
                 for shot in results:
                     print(shot)
+            else:
+                print("Invalid parameter choice.")
         elif choice == '3':
+            # Exit the program
             print("Exiting the program...")
             break
         else:
             print("Invalid choice. Please try again.")
 
+# Mapping of user input to parameter names
 query_map = {
     '1': 'player_name',
     '2': 'event_type',
@@ -143,6 +154,7 @@ query_map = {
 }
 
 def print_choices():
+    """Print the list of searchable parameters."""
     print("This program supports querying by the following parameters:")
     print("1. Player name")
     print("2. Event type")
@@ -153,40 +165,34 @@ def print_choices():
 
 @app.route('/api/query', methods=['POST'])
 def handle_post():
-    # Access JSON data from the request body
-    data = request.get_json()  # Parses JSON body
+    """Handle POST requests for search queries via the API."""
+    data = request.get_json()  # Parse JSON body
     if data is None:
         return jsonify({"error": "Invalid or missing JSON"}), 400
-    
-    if 'request_type' not in data:
-        return jsonify({"error": "Missing 'request_type' in JSON"}), 400
-    
+
+    # Validate required fields in the JSON data
+    required_fields = ['request_type', 'param', 'value', 'result_limit']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"error": f"Missing '{field}' in JSON"}), 400
+
     request_type = data['request_type']
-
-    if 'param' not in data:
-        return jsonify({"error": "Missing 'param' in JSON"}), 400
-    
     param = data['param']
-
-    if param not in query_map.values():
-        return jsonify({"error": "Invalid parameter"}), 400
-    
-    if 'value' not in data:
-        return jsonify({"error": "Missing 'value' in JSON"}), 400
-    
     value = data['value']
-
-    if 'result_limit' not in data:
-        return jsonify({"error": "Missing 'result_limit' in JSON"}), 400
-    
     result_limit = data['result_limit']
 
-    # parse result_limit as an integer
-    result_limit = int(result_limit)
+    # Validate parameter and result_limit
+    if param not in query_map.values():
+        return jsonify({"error": "Invalid parameter"}), 400
 
-    if not isinstance(result_limit, int) or not 1 <= result_limit <= 218702:
+    try:
+        result_limit = int(result_limit)
+        if not 1 <= result_limit <= 218702:
+            raise ValueError
+    except ValueError:
         return jsonify({"error": "Invalid 'result_limit' value"}), 400
-    
+
+    # Process the search based on request type
     if request_type == 'tfidf':
         tfidf = TFIDFSearch()
         tfidf.preprocessData()
@@ -197,8 +203,9 @@ def handle_post():
         time_after = time.time()
 
         time_took = f"{time_after - time_before:.4f}"
-        result_count = len(results) 
+        result_count = len(results)
 
+        # Return search results as JSON
         return jsonify({"results": [shot.__dict__ for shot in results], "time": time_took, "count": result_count})
     elif request_type == 'iis':
         inverted_index = InvertedIndexSearch()
@@ -211,21 +218,20 @@ def handle_post():
         time_took = f"{time_after - time_before:.4f}"
         result_count = len(results)
 
+        # Return search results as JSON
         return jsonify({"results": [shot.__dict__ for shot in results], "time": time_took, "count": result_count})
-    
-    return jsonify({"received": data})
+
+    return jsonify({"error": "Invalid 'request_type' value"}), 400
 
 def start_server():
-    # load_shots_from_csv("shots.csv")  # Preload shots for web mode
+    """Start the Flask web server."""
     tfidf = TFIDFSearch()
     tfidf.preprocessData()
     tfidf.compute_TF_IDF()
 
     inverted_index = InvertedIndexSearch()
     inverted_index.preprocessData()
-    tfidf.preprocessData()
-    tfidf.compute_TF_IDF()
-    inverted_index.preprocessData()
+
     app.run(debug=False)
 
 if __name__ == '__main__':
@@ -234,9 +240,9 @@ if __name__ == '__main__':
     print("Loading data...")
 
     if mode == '1':
-        main()
+        main()  # Run in command-line mode
     elif mode == '2':
-        start_server()
+        start_server()  # Run in server mode
     else:
         print("Invalid mode. Starting in server mode.")
         start_server()
