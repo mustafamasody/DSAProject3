@@ -40,12 +40,19 @@ const HomePage = () => {
 
   return (
     <div className="flex flex-col w-full min-h-screen items-center justify-center bg-black">
-      <h1 className="text-4xl font-bold text-white">Welcome to the NBA Shot Search Engine</h1>
+
+      <div className="flex flex-row space-x-8 items-center justify-center">
+        <img src={require("./images/mustafa.jpg")} className="w-48 h-48 rounded-full border border-4 border-neutral-700" alt="Mustafa" />
+        <img src={require("./images/saeed.png")} className="w-48 h-48 rounded-full border border-4 border-neutral-700" alt="Saeed" />
+        <img src={require("./images/shunmuka.JPG")} className="w-48 h-48 rounded-full border border-4 border-neutral-700" alt="Shunmuka" />
+      </div>
+
+      <h1 className="text-4xl mt-8 font-bold text-white">Welcome to the NBA Shot Search Engine</h1>
 
       {
         flowState === 0 && (
           <div className="flex flex-col items-center justify-center w-full h-">
-              <p className="text-xl mt-12 font-regular text-white">Let's start with how you want to search.</p>
+              <p className="text-xl mt-8 font-regular text-white">Let's start with how you want to search.</p>
 
               <button 
               onClick={() => setAlgorithmSelectorOpen(!algorithmSelectorOpen)}
@@ -99,7 +106,7 @@ const HomePage = () => {
       {
         flowState === 1 && (
           <div className="flex flex-col items-center justify-center w-full h-">
-              <p className="text-xl mt-12 font-regular text-white">Now, choose what you want to query by.</p>
+              <p className="text-xl mt-8 font-regular text-white">Now, choose what you want to query by.</p>
 
               <button 
               onClick={() => setQueryByOpen(!queryByOpen)}
@@ -187,7 +194,7 @@ const HomePage = () => {
 
               {
                 queryBySelected !== '' && (
-                  <h1 className="text-3xl mt-12 font-bold text-white">Instructions</h1>
+                  <h1 className="text-3xl mt-8 font-bold text-white">Instructions</h1>
                 )
               }
               {
@@ -239,7 +246,7 @@ const HomePage = () => {
       {
         flowState === 2 && (
           <div className="flex flex-col items-center justify-center w-full h-">
-              <p className="text-xl mt-12 font-regular text-white">Now, enter the number of search results you want to see.</p>
+              <p className="text-xl mt-8 font-regular text-white">Now, enter the number of search results you want to see.</p>
 
               <input 
               value={searchResultsCountInput}
@@ -269,7 +276,7 @@ const HomePage = () => {
       {
         flowState === 3 && (
           <div className="flex flex-col items-center justify-center w-full h-">
-              <p className="text-xl mt-12 font-regular text-white">Now, click the button below to search.</p>
+              <p className="text-xl mt-8 font-regular text-white">Now, click the button below to search.</p>
 
               { requestLoading ? (
                 <div className="mt-4">
@@ -315,7 +322,7 @@ const HomePage = () => {
       {
         flowState === 4 && (
           <div className="flex flex-col items-center justify-center w-full h-auto">
-              <p className="text-xl mt-12 mb-4 font-regular text-white">The query took {requestData.time} seconds and {requestData.count} results were found.</p>
+              <p className="text-xl mt-8 mb-4 font-regular text-white">The query took {requestData.time} seconds and {requestData.count} results were found.</p>
 
               <div className="flex flex-col space-y-4 max-w-screen-lg  w-full h-[36rem] overflow-y-scroll">
                 {
